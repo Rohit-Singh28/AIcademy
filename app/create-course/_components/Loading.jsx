@@ -23,7 +23,7 @@ function Loading({loading}) {
       <AlertDialogDescription asChild>
         <div className={"flex flex-col items-center  py-6"}>
             <Image src="/read.gif" alt="loading" width={100} height={100} />
-            <h1>Please wait... AI is working to Generaate Your Course</h1>
+            <h1>Please wait... AI is working to Generate Your Course</h1>
         </div>
       </AlertDialogDescription>
     </AlertDialogHeader>

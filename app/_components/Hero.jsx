@@ -1,28 +1,30 @@
 import Link from 'next/link'
 import React from 'react'
 
+import Spline from '@splinetool/react-spline/next';
+import { Button } from '@/components/ui/button';
+import { useRouter } from 'next/navigation';
+
+
 const Hero = () => {
+
+    const router = useRouter();
+
     return (
-        <section className="">
-            <div className="mx-auto max-w-screen-xl px-4 py-16 lg:flex lg:h-[calc(100vh-80px)] lg:items-center">
-                <div className="mx-auto max-w-xl text-center">
-                    <h1 className="text-6xl mb-6 md:mb-0  font-extrabold sm:text-5xl text-primary">
-                        AI Course Generator
-                    </h1>
-                    <strong className="text-4xl text-black text-bold  sm:text-5xl sm:block my-8 md:my-3">Custom Learning Path Powered By AI</strong>
+        <section className="flex ">
 
-                    <p className='my-8 text-xl md:text-[1rem]'>Lorem ipsum, dolor sit amet consectetur adipisicing elit. Sint adipisci dignissimos blanditiis labore quod,.</p>
+            <div className='relative top-40 left-16'>
+                <h1 className='text-9xl font-semibold mb-6 font-primaryfont'>AIcademy</h1>
+                <p className='text-5xl ml-6 font-secondaryfont'>The future of E-Learning</p>
 
-                    <Link href="/dashboard" className="mt-8 flex flex-wrap justify-center gap-4">
-                        <button
-                            className="block w-full rounded bg-primary px-12 py-3 text-sm font-medium text-white shadow hover:bg-purple-800 focus:outline-none focus:ring sm:w-auto"
-                            
-                        >
-                            Get Started
-                        </button>
-                    </Link>
-                </div>
+                <Button className=' cursor-pointer my-12 text-xl w-[200px] py-4 ml-6' onClick={() => { router.replace('/dashboard') }}>Get Started</Button>
             </div>
+            <main className='z-0 relative top-10 left-16'> 
+                <Spline
+                    scene="https://prod.spline.design/F5N3f2HeMm3EqKPB/scene.splinecode"
+                />
+            </main>
+
         </section>
     )
 }

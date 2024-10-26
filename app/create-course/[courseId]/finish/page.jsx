@@ -36,7 +36,7 @@ const page = ({ params }) => {
 
   return (
     <div className="py-8 px-4 md:px-28 w-full">
-      <h1 className="pb-6 mb-4 text-4xl font-semibold text-center">Congarts your course is created!</h1>
+      <h1 className="pb-6 mb-4 text-4xl font-semibold text-center">Congratulations your course is created!</h1>
       <div className=" shadow-sm border p-6 flex flex-col-reverse md:flex-row gap-16 ">
             <div className="w-full md:w-[50%] space-y-10">
                 <h1 className="text-3xl font-bold  flex gap-8">

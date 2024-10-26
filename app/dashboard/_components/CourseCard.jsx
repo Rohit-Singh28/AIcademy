@@ -23,7 +23,7 @@ const CourseCard = ({ course,setDel }) => {
                         <span><Clock size={15}/></span>
                         {course?.duration}
                     </p>
-                    <div className=' text-sm flex gap-2 justify-center items-center'>
+                    <div className=' text-sm flex gap-2 justify-center items-center  capitalize'>
                         <span><BookOpen size={15} /></span>{course?.level}
                         <p><DropDown courseId={course?.courseId} setDel={setDel}/></p>
                     </div>

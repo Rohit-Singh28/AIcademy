@@ -2,7 +2,7 @@ const category = [
     {
         indx:1,
         img:"/coding.png",
-        title:"Coding"
+        title:"Technical"
     },
     {
         indx:2,
@@ -12,7 +12,7 @@ const category = [
     {
         indx:3,
         img:"/yoga.webp",
-        title:"Yoga"
+        title:"Sports and Fitness"
     }
 ]
 

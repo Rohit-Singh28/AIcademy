@@ -37,6 +37,14 @@ const CourseInfo = () => {
         })
 
     }
+
+    const handleStart = (e) => {
+        e.preventDefault();
+        window.scrollTo({
+            top: document.documentElement.scrollHeight,
+            behavior: "smooth"
+          });
+    }
     
 
     // console.log(courseInfo);
@@ -59,7 +67,7 @@ const CourseInfo = () => {
                             {courseInfo?.category}
                         </span>
                     </div>
-                    <Button className='w-full'>Start</Button>
+                    <Button className='w-full' onClick={handleStart}>Start</Button>
                 </div>
             </div>
             <div>

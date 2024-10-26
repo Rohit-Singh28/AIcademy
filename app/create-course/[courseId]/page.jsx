@@ -13,17 +13,17 @@ import CourseDetails from "./_components/CourseDetails";
 import ChapterList from "./_components/ChapterList";
 import Loading from "../_components/Loading";
 import { GenerateCourseContentAI } from "@/configs/AiModel";
+import { jsonrepair } from 'jsonrepair';
 
-const page = ({ params }) => {
+const Page = ({ params }) => {
   const { user } = useUser();
-  const [loading, setLoading] = useState(false); 
+  const [loading, setLoading] = useState(true); // Set initial loading to true
   const { courseInfo, setCourseInfo } = useContext(CourseDataContext);
   const router = useRouter();
   const BASE_URL_YOUTUBE = "https://www.googleapis.com/youtube/v3/search?";
 
   // Fetch course data from the database
   const fetchCourseData = async () => {
-    setLoading(true); 
     try {
       const result = await db
         .select()
@@ -35,10 +35,8 @@ const page = ({ params }) => {
           )
         );
       setCourseInfo(result[0]);
-      setLoading(false); 
     } catch (error) {
       console.error("Error fetching course data:", error);
-      setLoading(false); 
     }
   };
 
@@ -80,73 +78,117 @@ const page = ({ params }) => {
 
   // Handle course generation
   const handleGenerateCourse = async () => {
-    setLoading(true); 
+    setLoading(true); // Start loading indicator before generation begins
     try {
       const courseOutput = courseInfo?.courseOutput;
-
+  
       await Promise.all(
         courseOutput.map(async (chapter, indx) => {
-          const PROMPT = `Provide a detailed explanation (min 600 words) on the topic "${chapter.chapter_name}" from Chapter: "${chapter.about}" in **valid JSON** format. The JSON should be structured as a list of objects with the following fields:
-                          1. "title": A short, descriptive title
-                          2. "explanation": A unique and concise explanation
-                          3. "code_example": Provide a relevant code example in ${courseInfo?.name}, wrapped in "<precode>" tags. If code is not available, omit this field.`;
-
-          const result = await GenerateCourseContentAI.sendMessage(PROMPT);
-          const rawAIResponse = await result.response?.text();
-
-          const content = tryFixInvalidJSON(rawAIResponse);
-
-          if (content) {
-            const res = await axios.get(BASE_URL_YOUTUBE, {
-              params: {
-                part: "snippet",
-                q: `${chapter.chapter_name}`,
-                maxResults: 1,
-                key: process.env.NEXT_PUBLIC_YOUTUBE_API_KEY,
-                type: "video",
-              },
-            });
-
-            const vId = res.data.items[0].id.videoId;
-
-            const CourseChapterData = {
-              courseId: courseInfo?.courseId,
-              chapterNo: indx,
-              chapterContent: content,
-              videoId: vId,
-            };
-
-            await db.insert(CourseChapter).values(CourseChapterData);
-            router.replace(`/create-course/${params?.courseId}/finish`);
-          } else {
-            console.error("Failed to fix or parse AI response JSON.");
-          }
+          let retryCount = 0;
+          const generatePrompt = () => `
+            Explain the topic "${chapter.chapter_name}" from Chapter "${chapter.about}" with a detailed explanation and code snippets (where applicable) in JSON format.
+            The JSON should include these fields:
+              - "title": A descriptive title
+              - "explanation": A clear, brief explanation of the topic
+              - "code_example": Include code relevant to ${courseInfo?.name} if available, wrapped in "<precode>" tags
+            Follow the example:
+            [
+              {
+                "title": "Intro to JavaScript",
+                "explanation": "JavaScript is a versatile programming language for web development.",
+                "code_example": "<precode>console.log('Hello, World!');</precode>"
+              }
+            ]
+            Provide only valid JSON output.`;
+  
+          const fetchDataWithRetry = async () => {
+            try {
+              const result = await GenerateCourseContentAI.sendMessage(generatePrompt());
+              const rawAIResponse = await result.response?.text();
+  
+              if (rawAIResponse.includes("RECITATION")) {
+                console.warn("RECITATION block detected. Retrying with adjusted prompt...");
+                if (++retryCount < 3) {
+                  await new Promise((resolve) => setTimeout(resolve, 1000)); // Delay before retry
+                  return fetchDataWithRetry();
+                } else {
+                  throw new Error("Repeated RECITATION block; stopping retries.");
+                }
+              }
+  
+              let content;
+              try {
+                content = jsonrepair(rawAIResponse);
+                content = JSON.parse(content);
+              } catch (repairError) {
+                console.error("JSON Repair failed, attempting manual fix.", repairError);
+                content = tryFixInvalidJSON(rawAIResponse);
+              }
+  
+              if (!content) throw new Error("Unable to parse AI response to JSON. Please try again.");
+              return content;
+  
+            } catch (error) {
+              console.error(`Error processing chapter ${indx}:`, error);
+              throw error; // Propagate error for each chapter
+            }
+          };
+  
+          const content = await fetchDataWithRetry();
+  
+          const res = await axios.get(BASE_URL_YOUTUBE, {
+            params: {
+              part: "snippet",
+              q: `${chapter.chapter_name}`,
+              maxResults: 1,
+              key: process.env.NEXT_PUBLIC_YOUTUBE_API_KEY,
+              type: "video",
+            },
+          });
+  
+          const vId = res.data.items[0].id.videoId;
+  
+          const CourseChapterData = {
+            courseId: courseInfo?.courseId,
+            chapterNo: indx,
+            chapterContent: content,
+            videoId: vId,
+          };
+  
+          await db.insert(CourseChapter).values(CourseChapterData);
         })
       );
-
-      setLoading(false);
+  
+      // Move `router.replace` here after all content is generated
+      router.replace(`/create-course/${params?.courseId}/finish`);
     } catch (error) {
       console.error("Error during course generation:", error);
-      setLoading(false);
+    } finally {
+      setLoading(false); // Stop loading only after completion of entire process
     }
   };
+  
 
   useEffect(() => {
-    fetchCourseData();
+    const loadData = async () => {
+      await fetchCourseData(); // Fetch course data
+      setLoading(false); // Set loading to false only after fetchCourseData completes
+    };
+    loadData();
   }, [params, user]);
 
   return (
     <div className="py-8 px-4 md:px-28 w-full">
-      <Loading loading={loading} /> 
+      <Loading loading={loading} />
       <h1 className="pb-6 mb-4 text-4xl font-semibold text-center">Course Layout</h1>
       <CourseInfo />
       <CourseDetails />
       <ChapterList />
-      <Button onClick={handleGenerateCourse} disabled={loading}> 
+      <Button onClick={handleGenerateCourse} disabled={loading}>
         {loading ? "Generating..." : "Generate Course"}
       </Button>
     </div>
   );
 };
 
-export default page;
+export default Page;

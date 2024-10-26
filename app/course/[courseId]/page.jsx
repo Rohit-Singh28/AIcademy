@@ -122,7 +122,7 @@ const page = ({ params }) => {
         </div>
           :
           <div className="flex-1 p-3 gap-4 flex-col h-screen overflow-y-scroll" id='main-content'>
-            <div className="text-2xl font-semibold mb-8 flex gap-3  items-center">
+            <div className="text-3xl font-bold mb-8 flex gap-3   items-center">
               <p>{selectedChapter?.chapter_name}</p>
               <span className=' ml-auto cursor-pointer md:hidden ' onClick={() => { setMenu(true) }}><Menu /></span>
             </div>
@@ -149,7 +149,7 @@ const page = ({ params }) => {
                       <p>{data.explanation}</p>
                     </div>
                     {
-                      data?.code_example &&
+                      data?.code_example && data?.code_example != '<precode></precode>' &&
                       <div className='text-white bg-black p-3 overflow-x-scroll'>
                         <pre>
                           <code>{data?.code_example}</code>

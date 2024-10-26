@@ -1,9 +1,10 @@
+"use client"
 import Header from "./_components/Header";
 import Hero from "./_components/Hero";
 
 export default function Home() {
   return (
-    <div>
+    <div className="h-screen overflow-hidden">
       <Header/>
       <Hero/>
     </div>

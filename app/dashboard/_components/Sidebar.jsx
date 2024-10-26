@@ -25,24 +25,23 @@ const Sidebar = ({setMenuBar}) => {
             icon: <AiOutlineHome />,
             link: "/dashboard"
         },
- 
+        {
+            id: 2,
+            title: "Progress",
+            icon: <HiOutlineSquare3Stack3D />,
+            link: "/dashboard/progress"
+        },
         {
             id: 3,
             title: "Upgrade",
             icon: <BsShieldCheck />,
             link: "/dashboard/upgrade"
         },
-        {
-            id: 4,
-            title: "Logout",
-            icon: <IoIosLogOut />,
-            link: "/dashboard/logout"
-        }
     ]
     return (
-        <div className='w-full md:w-[250px] py-5 px-5 space-y-10'>
+        <div className='w-full md:w-[250px] py-5 px-5 space-y-10 border-r-2'>
             <div className='flex justify-center items-center'>
-                <Image src={'/images.jpeg'} width={100} height={200} alt='logo'/>
+                <Image src={'/AC.jpg'} width={200} height={200} alt='logo'/>
             </div>
             <ul className='flex gap-2 flex-col'>
                 {option.map((ele) => {

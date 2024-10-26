@@ -27,7 +27,7 @@ export default function PurchaseCard({title,NoCourse,Feature,People,Price}) {
           </div>
         </div>
         <div className="mt-6 bg-violet-50 p-4 rounded-lg">
-          <div className="text-3xl font-bold text-violet-600">$ {Price}</div>
+          <div className="text-3xl font-bold text-violet-600"> &#8377; {Price}</div>
           <div className="text-sm text-violet-600">One-time purchase</div>
         </div>
       </CardContent>

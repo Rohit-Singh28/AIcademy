@@ -36,9 +36,9 @@ const SelectOpt = () => {
                     onChange={(e) => handleOnchange("duration", e.target.value)}>
 
                     <option>select opt</option>
+                    <option value={"3hrs"}>3hrs</option>
                     <option value={"5hrs"}>5hrs</option>
-                    <option value={"10hrs"}>10hrs</option>
-                    <option value={"15hrs"}>15hrs</option>
+                    <option value={"7hrs"}>7hrs</option>
 
                 </select>
             </div>

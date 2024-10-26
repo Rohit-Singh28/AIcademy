@@ -15,6 +15,7 @@ import { v1 as uuidv1 } from 'uuid';
 import { useUser } from '@clerk/nextjs';
 import { useRouter } from 'next/navigation';
 import Loading from './_components/Loading';
+import axios from 'axios';
 require('dotenv').config()
 
 const page = () => {
@@ -107,21 +108,33 @@ const page = () => {
 
     const GenerateCourseLayout = async () => {
         setLoading(true);
-        const generalPrompt = "Generate A Course Tutorial on Following Details with field as Course Name , Description , Along with Chapter Name ,About ,Duration :";
-        const userPromt = `Category : ${userInputData?.category}, Topic : ${userInputData?.course} , Level : ${userInputData?.difficulty} , Duration:${userInputData?.duration} , No of Chapter : ${userInputData?.Chapter} it is important to include ${userInputData?.description} topic/related to this  , in json format`;
+        const generalPrompt = "Generate A Course Tutorial on Following Details with field as course_name , description , Along with chapter_name , about, duration , category : don't change the field name";
+        const userPromt = `Category : ${userInputData?.category}, Topic : ${userInputData?.course} , Level : ${userInputData?.difficulty} , Duration:${userInputData?.duration} , No of Chapter : ${userInputData?.Chapter} it is important to include ${userInputData?.description} topic/related to this  , in json format .`;
         const final_promt = generalPrompt + userPromt;
         // console.log(final_promt);`
 
-        const result = await GenerateCourseLayoutAI.sendMessage(final_promt);
+        // const result = await GenerateCourseLayoutAI.sendMessage(final_promt);
         // console.log(result.response?.text());
         // console.log(JSON.parse(result.response?.text()));
 
-        setCourseLayout(JSON.parse(result.response?.text()));
+        // setCourseLayout(JSON.parse(result.response?.text()));    
         
-        await UpdateDb(JSON.parse(result.response?.text()));   
-        setLoading(false); 
+        // await UpdateDb(JSON.parse(result.response?.text()));   
+        // setLoading(false); 
 
+        try {
+            const response = await axios.post('/api/groqChat',{
+              title:final_promt
+            });
+            const CourseData =  JSON.parse(response.data);
+            console.log(CourseData);
+            setCourseLayout(CourseData);
+            await UpdateDb(CourseData);  
+          } catch (error) {
+            console.error("Error fetching Groq API:", error);
+          }
 
+          setLoading(false);
     }
 
     useEffect(() => {

@@ -8,6 +8,10 @@ module.exports = {
   ],
   theme: {
   	extend: {
+		fontFamily: {
+			primaryfont: ["PT Serif", 'sans-serif'],
+			secondaryfont: ["Ubuntu", 'sans-serif'], // Add your custom font
+		  },
   		colors: {
   			background: 'hsl(var(--background))',
   			foreground: 'hsl(var(--foreground))',
