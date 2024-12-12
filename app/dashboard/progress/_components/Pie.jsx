@@ -1,7 +1,7 @@
 import React from "react";
-import Highcharts from "highcharts";
-import HighchartsReact from "highcharts-react-official";
-import Highcharts3D from "highcharts/highcharts-3d";
+import Highcharts from 'highcharts';
+import HighchartsReact from 'highcharts-react-official';
+import Highcharts3D from 'highcharts/highcharts-3d';
 
 // Initialize 3D module
 Highcharts3D(Highcharts);
